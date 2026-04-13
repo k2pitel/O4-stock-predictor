@@ -50,7 +50,8 @@ PARAM_GRIDS: dict[str, dict] = {
 }
 
 
-def tune_model(name: str, model, X_train, y_train, cv: int = 3):
+def tune_model(name: str, model: object, X_train: np.ndarray,
+               y_train: np.ndarray, cv: int = 3) -> object:
     """Run GridSearchCV if a param grid is available for *name*."""
     grid = PARAM_GRIDS.get(name)
     if grid is None:

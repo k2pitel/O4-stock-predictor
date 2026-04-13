@@ -265,9 +265,11 @@ def main() -> None:
 
         # 7. Trading strategy (use best individual: XGBoost by default)
         print("\nSTEP 7: Trading strategy")
-        best_clf_name = clf_results["F1"].idxmax()
+        f1_col = clf_results["F1"].dropna()
+        best_clf_name = f1_col.idxmax() if len(f1_col) > 0 else "XGBoost"
         best_clf = (result["classifiers"].get(best_clf_name)
-                    or result["ensemble"])
+                    or result.get("ensemble")
+                    or list(result["classifiers"].values())[0])
         print(f"  Using {best_clf_name} for strategy signals")
 
         if hasattr(best_clf, "predict"):

@@ -85,7 +85,8 @@ def evaluate_keras_model(model, X_test, y_test, name: str = "Keras") -> dict:
     return m
 
 
-def evaluate_lstm(model, X_test_sc, y_test, seq_len: int) -> dict:
+def evaluate_lstm(model: object, X_test_sc: np.ndarray,
+                  y_test: pd.Series, seq_len: int) -> dict:
     """Evaluate LSTM by creating sequences from the test set."""
     X_seq, y_seq = create_sequences(X_test_sc, y_test.values, seq_len=seq_len)
     if len(X_seq) == 0:

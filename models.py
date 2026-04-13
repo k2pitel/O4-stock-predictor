@@ -156,9 +156,9 @@ def fit_prophet(model: Prophet, dates, prices) -> Prophet:
 
 
 def predict_prophet(model: Prophet, periods: int = 30,
-                    freq: str = "B") -> "pd.DataFrame":
+                    freq: str = "B") -> pd.DataFrame:
     """Generate future forecast from a fitted Prophet model."""
-    import pandas as pd
+    import pandas as pd  # noqa: F811
     future = model.make_future_dataframe(periods=periods, freq=freq)
     forecast = model.predict(future)
     return forecast

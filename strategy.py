@@ -85,7 +85,10 @@ def strategy_metrics(sim: pd.DataFrame,
     strat_ret = sim["StrategyReturn"]
     equity = sim["Equity"]
 
-    total_return = equity.iloc[-1] / equity.iloc[0] - 1 if len(equity) > 0 else 0.0
+    if len(equity) == 0 or equity.iloc[0] == 0:
+        total_return = 0.0
+    else:
+        total_return = equity.iloc[-1] / equity.iloc[0] - 1
     ann_vol = strat_ret.std() * np.sqrt(252)
     ann_return = strat_ret.mean() * 252
     sharpe = ((ann_return - risk_free_rate) / ann_vol) if ann_vol > 0 else 0.0
