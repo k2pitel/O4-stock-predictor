@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>O4 Poster — Stock Price Prediction</title>
+<style>
+
+@page { size: A4 landscape; margin: 0; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: #888;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+
+.poster {
+  width: 297mm;
+  height: 210mm;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7.5pt;
+  line-height: 1.35;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0,0,0,.45);
+}
+
+/* ── TITLE ── */
+.title-sec {
+  padding: 4mm 6mm 3mm;
+  text-align: center;
+  border-bottom: 1.5px solid #555;
+  flex-shrink: 0;
+}
+.title-sec h1 {
+  font-size: 15pt;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 1.5mm;
+}
+.title-sec .auth {
+  font-size: 8.5pt;
+  color: #333;
+}
+
+/* ── BODY ── */
+.body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── COLUMNS ── */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+  padding: 3mm;
+  overflow: hidden;
+}
+.c1 { width: 25%; border-right: 1px solid #ccc; }
+.c2 { width: 45%; border-right: 1px solid #ccc; }
+.c3 { width: 30%; }
+
+/* ── BOXES ── */
+.box {
+  border: 1px solid #aaa;
+  padding: 5px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.box.grow { flex: 1; }
+
+/* ── SECTION TITLE ── */
+.st {
+  font-weight: bold;
+  font-size: 8.5pt;
+  border-bottom: 1px solid #aaa;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  color: #111;
+  flex-shrink: 0;
+}
+
+/* ── TEXT ── */
+ul { margin-left: 10px; }
+ul li { margin-bottom: 2px; }
+p { margin-bottom: 2px; }
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 6.5pt;
+  flex-shrink: 0;
+}
+th {
+  background: #e0e0e0;
+  font-weight: bold;
+  padding: 2px 3px;
+  text-align: center;
+  border: 0.5px solid #bbb;
+}
+td {
+  padding: 2px 3px;
+  text-align: center;
+  border: 0.5px solid #e0e0e0;
+}
+.tl { text-align: left !important; }
+tr:nth-child(even) td { background: #f7f7f7; }
+.best { background: #d4edda !important; font-weight: bold; color: #155724; }
+.tsep { margin-top: 4px; }
+
+/* ── FIGURES ── */
+.fig {
+  text-align: center;
+  flex-shrink: 0;
+}
+.fig img {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.cap {
+  font-size: 5.5pt;
+  color: #555;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+/* push a fig to bottom of flex column */
+.pushbot { margin-top: auto; padding-top: 4px; }
+
+@media print {
+  html { background: white; padding: 0; }
+  .poster { box-shadow: none; }
+}
+</style>
+</head>
+<body>
+<div class="poster">
+
+<!-- ════════════ TITLE ════════════ -->
+<div class="title-sec">
+  <h1>Stock Price Direction Prediction using Machine Learning</h1>
+  <div class="auth">
+    Bleron Gashi &amp; Kevin Pham &nbsp;|&nbsp; Group 29 &nbsp;|&nbsp; SWMAL &nbsp;|&nbsp; Aarhus University &nbsp;|&nbsp; 2026
+  </div>
+</div>
+
+<!-- ════════════ BODY ════════════ -->
+<div class="body">
+
+  <!-- ══ COL 1: Introduction + Materials and Methods ══ -->
+  <div class="col c1">
+
+    <!-- Introduction -->
+    <div class="box">
+      <div class="st">Introduction</div>
+      <ul>
+        <li>Binary classification: predict next-day stock direction (↑/↓)</li>
+        <li>AAPL, JPM, TSLA &nbsp;|&nbsp; 2016–2025 &nbsp;|&nbsp; ~2,464 trading days</li>
+        <li>Data: Yahoo Finance + VIX index</li>
+        <li>Supervised learning + Prophet forecasting + trading strategy</li>
+      </ul>
+    </div>
+
+    <!-- Materials and Methods (grows + SHAP image at bottom) -->
+    <div class="box grow">
+      <div class="st">Materials and Methods</div>
+      <p><b>26 features:</b> MA (10/20/50d), RSI, MACD, Bollinger Bands,
+         volatility (10/20d), momentum (1/5d), lagged close (1–5d),
+         daily return, VIX, volume</p>
+      <p style="margin-top:3px"><b>7 models:</b> Logistic Regression, Random Forest,
+         SVM, XGBoost, Voting Ensemble, MLP, LSTM</p>
+      <p style="margin-top:3px"><b>Pipeline:</b> 80/20 chronological split →
+         StandardScaler → GridSearchCV (TimeSeriesSplit k=3) → Train → Evaluate</p>
+      <p style="margin-top:3px"><b>Cost fn:</b> Binary Cross-Entropy (MLP/LSTM) | Gini impurity (trees)</p>
+      <p style="margin-top:2px"><b>Overfitting:</b> Dropout 0.2–0.3, L2 reg, max_depth constraints</p>
+
+      <div class="fig pushbot">
+        <img src="output/shap_XGBoost.png" alt="SHAP XGBoost TSLA" style="max-height:62mm">
+        <p class="cap">Fig. 1 — SHAP values (XGBoost/TSLA). RSI, MA_50 and Return_1d are top predictors.</p>
+      </div>
+    </div>
+
+  </div><!-- /c1 -->
+
+  <!-- ══ COL 2: Results ══ -->
+  <div class="col c2">
+
+    <div class="box grow">
+      <div class="st">Results</div>
+
+      <!-- Table 1: Classification accuracy -->
+      <table>
+        <thead>
+          <tr>
+            <th class="tl">Model</th>
+            <th>AAPL Acc.</th>
+            <th>JPM Acc.</th>
+            <th>TSLA Acc.</th>
+            <th>TSLA F1</th>
+            <th>TSLA AUC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="tl">Logistic Reg.</td><td>49.3%</td><td>52.3%</td><td>53.8%</td><td>0.567</td><td>0.538</td></tr>
+          <tr><td class="tl">Random Forest</td><td>44.2%</td><td>41.6%</td><td>51.3%</td><td>0.502</td><td>0.525</td></tr>
+          <tr><td class="tl">SVM</td>          <td>48.1%</td><td>42.4%</td><td>52.3%</td><td>0.511</td><td>0.466</td></tr>
+          <tr><td class="tl best">XGBoost ★</td><td>45.0%</td><td>42.4%</td><td class="best">54.4%</td><td class="best">0.480</td><td class="best">0.546</td></tr>
+          <tr><td class="tl">Ensemble</td>     <td>45.6%</td><td>44.4%</td><td>52.3%</td><td>0.488</td><td>0.535</td></tr>
+          <tr><td class="tl">MLP</td>          <td>46.9%</td><td>44.2%</td><td>53.5%</td><td>0.514</td><td>0.552</td></tr>
+          <tr><td class="tl">LSTM</td>         <td>48.7%</td><td>46.3%</td><td>54.1%</td><td>0.461</td><td>0.550</td></tr>
+        </tbody>
+      </table>
+
+      <!-- Table 2: Trading strategy -->
+      <table class="tsep">
+        <thead>
+          <tr>
+            <th>Stock</th>
+            <th>Strategy Return</th>
+            <th>Sharpe Ratio</th>
+            <th>Max Drawdown</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>AAPL</td><td>+23.2%</td><td>0.58</td><td>−31.6%</td></tr>
+          <tr><td>JPM</td><td>+55.5%</td><td class="best">1.54 ★</td><td class="best">−9.1% ★</td></tr>
+          <tr><td>TSLA</td><td class="best">+163.3% ★</td><td>1.30</td><td>−32.5%</td></tr>
+        </tbody>
+      </table>
+
+      <!-- Fig 2: Equity curve -->
+      <div class="fig" style="margin-top:4px">
+        <img src="output/equity_TSLA.png" alt="TSLA Equity Curve" style="max-height:50mm">
+        <p class="cap">Fig. 2 — TSLA equity curve. ML strategy (blue, +163%) vs Buy &amp; Hold (orange, +120%)</p>
+      </div>
+
+      <!-- Fig 3: Learning curves -->
+      <div class="fig" style="margin-top:4px">
+        <img src="output/learning_curve_MLP_TSLA.png" alt="MLP Learning Curve TSLA" style="max-height:47mm">
+        <p class="cap">Fig. 3 — MLP learning curves (TSLA). Train loss ↓ 0.72→0.67, val loss stable ~0.69. Dropout prevents overfitting.</p>
+      </div>
+
+    </div>
+
+  </div><!-- /c2 -->
+
+  <!-- ══ COL 3: Conclusions + Literature + Acknowledgments ══ -->
+  <div class="col c3">
+
+    <!-- Conclusions (grows; prophet image pushed to bottom) -->
+    <div class="box grow">
+      <div class="st">Conclusions</div>
+      <ul>
+        <li>All models ~50–54% accuracy — consistent with EMH</li>
+        <li>TSLA most predictable; ML strategy beats Buy &amp; Hold (+163% vs +120%)</li>
+        <li>JPM best risk-adjusted: Sharpe 1.54, max drawdown −9%</li>
+        <li>Dropout + L2 reg prevents overfitting in MLP and LSTM</li>
+      </ul>
+
+      <div class="fig pushbot">
+        <img src="output/prophet_TSLA.png" alt="Prophet TSLA" style="max-height:62mm">
+        <p class="cap">Fig. 4 — Prophet forecast (TSLA). RMSE=49.6. Captures trend; misses sharp spikes.</p>
+      </div>
+    </div>
+
+    <!-- Literature cited -->
+    <div class="box">
+      <div class="st">Literature Cited</div>
+      <ul>
+        <li>Géron (2022). <em>Hands-On ML</em>. O'Reilly.</li>
+        <li>Chen &amp; Guestrin (2016). XGBoost. <em>KDD</em>.</li>
+        <li>Taylor &amp; Letham (2018). Prophet. <em>Am. Statistician</em>.</li>
+        <li>Hochreiter &amp; Schmidhuber (1997). LSTM. <em>Neural Computation</em>.</li>
+        <li>Pedregosa et al. (2011). Scikit-learn. <em>JMLR</em>.</li>
+        <li>Aroussi. yfinance. GitHub.</li>
+      </ul>
+    </div>
+
+    <!-- Acknowledgments -->
+    <div class="box">
+      <div class="st">Acknowledgments</div>
+      <p>SWMAL Course — Aarhus University</p>
+      <p>Group 29: Bleron Gashi &amp; Kevin Pham</p>
+    </div>
+
+  </div><!-- /c3 -->
+
+</div><!-- /body -->
+</div><!-- /poster -->
+</body>
+</html>

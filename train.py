@@ -108,12 +108,12 @@ def train_ensemble(X_train: np.ndarray, y_train: np.ndarray) -> object:
 
 def train_mlp(X_train: np.ndarray, y_train: np.ndarray,
               epochs: int = 50, batch_size: int = 64,
-              validation_split: float = 0.1) -> object:
-    """Build and train a feedforward MLP."""
+              validation_split: float = 0.1) -> tuple:
+    """Build and train a feedforward MLP. Returns (model, history)."""
     model = build_mlp(input_dim=X_train.shape[1])
-    model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
-              validation_split=validation_split, verbose=0)
-    return model
+    history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,
+                        validation_split=validation_split, verbose=0)
+    return model, history
 
 
 # ---------------------------------------------------------------------------
@@ -123,18 +123,12 @@ def train_mlp(X_train: np.ndarray, y_train: np.ndarray,
 def train_lstm(X_train: np.ndarray, y_train: np.ndarray,
                seq_len: int = 30, epochs: int = 30,
                batch_size: int = 64) -> tuple:
-    """Build and train an LSTM model.
-
-    Returns
-    -------
-    model : keras.Model
-    seq_len : int  (needed later for prediction)
-    """
+    """Build and train an LSTM model. Returns (model, seq_len, history)."""
     X_seq, y_seq = create_sequences(X_train, y_train, seq_len=seq_len)
     model = build_lstm(seq_len=seq_len, n_features=X_seq.shape[2])
-    model.fit(X_seq, y_seq, epochs=epochs, batch_size=batch_size,
-              validation_split=0.1, verbose=0)
-    return model, seq_len
+    history = model.fit(X_seq, y_seq, epochs=epochs, batch_size=batch_size,
+                        validation_split=0.1, verbose=0)
+    return model, seq_len, history
 
 
 # ---------------------------------------------------------------------------
@@ -187,17 +181,19 @@ def run_training_pipeline(
 
     # MLP
     print("\n=== Training MLP ===")
-    mlp = train_mlp(X_train_sc, y_train.values, epochs=mlp_epochs)
+    mlp, mlp_history = train_mlp(X_train_sc, y_train.values, epochs=mlp_epochs)
 
     # LSTM
     print("\n=== Training LSTM ===")
-    lstm_model, seq_len = train_lstm(X_train_sc, y_train.values, epochs=lstm_epochs)
+    lstm_model, seq_len, lstm_history = train_lstm(X_train_sc, y_train.values, epochs=lstm_epochs)
 
     return {
         "classifiers": trained_clf,
         "ensemble": ensemble,
         "mlp": mlp,
+        "mlp_history": mlp_history,
         "lstm": lstm_model,
+        "lstm_history": lstm_history,
         "lstm_seq_len": seq_len,
         "scaler": scaler,
         "X_train": X_train_sc,

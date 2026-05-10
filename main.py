@@ -56,6 +56,41 @@ def ensure_output_dir() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Learning curves (cost function / overfitting diagnostic)
+# ---------------------------------------------------------------------------
+
+def plot_learning_curve(history, model_name: str, ticker: str) -> None:
+    """Plot training and validation loss + accuracy over epochs."""
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+    # Loss
+    axes[0].plot(history.history["loss"], label="Train loss")
+    if "val_loss" in history.history:
+        axes[0].plot(history.history["val_loss"], label="Val loss")
+    axes[0].set_title(f"{model_name} — Loss ({ticker})")
+    axes[0].set_xlabel("Epoch")
+    axes[0].set_ylabel("Binary Cross-Entropy")
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+
+    # Accuracy
+    axes[1].plot(history.history["accuracy"], label="Train accuracy")
+    if "val_accuracy" in history.history:
+        axes[1].plot(history.history["val_accuracy"], label="Val accuracy")
+    axes[1].set_title(f"{model_name} — Accuracy ({ticker})")
+    axes[1].set_xlabel("Epoch")
+    axes[1].set_ylabel("Accuracy")
+    axes[1].legend()
+    axes[1].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    path = os.path.join(OUTPUT_DIR, f"learning_curve_{model_name}_{ticker}.png")
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+    print(f"  Learning curve saved to {path}")
+
+
+# ---------------------------------------------------------------------------
 # Feature importance
 # ---------------------------------------------------------------------------
 
@@ -241,6 +276,7 @@ def main() -> None:
             result["mlp"], result["X_test"], result["y_test"], name="MLP",
         )
         clf_results.loc["MLP"] = mlp_metrics
+        plot_learning_curve(result["mlp_history"], "MLP", ticker)
 
         # LSTM
         lstm_metrics = evaluate_lstm(
@@ -249,6 +285,7 @@ def main() -> None:
         )
         if lstm_metrics:
             clf_results.loc["LSTM"] = lstm_metrics
+        plot_learning_curve(result["lstm_history"], "LSTM", ticker)
 
         print(f"\n  === Classification summary ({ticker}) ===")
         print(clf_results.to_string())
