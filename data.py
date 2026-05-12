@@ -12,7 +12,7 @@ import pandas as pd
 TICKERS = ["AAPL", "JPM", "TSLA"]
 MARKET_TICKERS = ["^VIX", "^GSPC"]
 DEFAULT_START = "2016-01-01"
-DEFAULT_END = "2025-12-31"
+DEFAULT_END = "2026-05-10"
 
 
 def download_ticker(ticker: str, start: str = DEFAULT_START,
