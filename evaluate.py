@@ -109,3 +109,12 @@ def mae(y_true, y_pred) -> float:
 
 def forecast_metrics(y_true, y_pred) -> dict:
     return {"RMSE": rmse(y_true, y_pred), "MAE": mae(y_true, y_pred)}
+
+
+from sklearn.preprocessing import StandardScaler
+
+def scale_features(X_train, X_test):
+    scaler = StandardScaler()
+    X_train_sc = scaler.fit_transform(X_train)
+    X_test_sc  = scaler.transform(X_test)
+    return X_train_sc, X_test_sc, scaler

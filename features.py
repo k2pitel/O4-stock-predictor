@@ -151,3 +151,53 @@ def scale_features(X_train: pd.DataFrame,
     X_train_sc = scaler.fit_transform(X_train)
     X_test_sc = scaler.transform(X_test)
     return X_train_sc, X_test_sc, scaler
+
+from sklearn.ensemble import VotingClassifier
+
+import tensorflow as tf
+from tensorflow import keras
+
+def build_features(df: pd.DataFrame) -> pd.DataFrame:
+    feat = df.copy()
+    close = feat["Close"]
+
+    # Moving averages
+    for w in [10, 20, 50]:
+        feat[f"MA_{w}"] = close.rolling(window=w).mean()
+
+    # RSI (14-period)
+    feat["RSI"] = compute_rsi(close, period=14)
+
+    # MACD
+    macd_cols = compute_macd(close, fast=12, slow=26, signal=9)
+    feat = pd.concat([feat, macd_cols], axis=1)
+
+    # Bollinger Bands
+    bb_cols = compute_bollinger(close, period=20, num_std=2.0)
+    feat = pd.concat([feat, bb_cols], axis=1)
+
+    # Returns and momentum
+    feat["Return_1d"]    = close.pct_change(1)
+    feat["Return_5d"]    = close.pct_change(5)
+    feat["Momentum_1d"]  = close.diff(1)
+    feat["Momentum_5d"]  = close.diff(5)
+
+    # Rolling volatility
+    feat["Volatility_10d"] = close.pct_change().rolling(10).std()
+    feat["Volatility_20d"] = close.pct_change().rolling(20).std()
+
+    # Lagged closes
+    for lag in [1, 2, 3, 5]:
+        feat[f"Close_Lag{lag}"] = close.shift(lag)
+
+    return feat.dropna().reset_index(drop=True)
+
+    PARAM_GRIDS = {
+    "LogisticRegression": {"C": [0.1, 1.0, 10.0]},
+    "RandomForest": {"n_estimators": [100, 200], "max_depth": [5, 10, None]},
+    "XGBoost": {
+        "n_estimators": [100, 200],
+        "max_depth": [3, 5],
+        "learning_rate": [0.05, 0.1],
+    },
+}

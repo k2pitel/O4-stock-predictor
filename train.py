@@ -203,3 +203,28 @@ def run_training_pipeline(
         "X_train_raw": X_train_raw,
         "X_test_raw": X_test_raw,
     }
+
+
+
+import yfinance as yf
+import pandas as pd
+
+TICKERS = ["AAPL", "JPM", "TSLA"]
+MARKET_TICKERS = ["^VIX", "^GSPC"]
+DEFAULT_START = "2016-01-01"
+DEFAULT_END   = "2026-05-10"
+
+def load_data(tickers, start, end):
+    data = {}
+    for ticker in tickers + MARKET_TICKERS:
+        df = yf.download(ticker, start=start, end=end,
+                         auto_adjust=True, progress=False)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        df = df.ffill().dropna()
+        data[ticker] = df
+    return data
+def add_classification_target(features: pd.DataFrame) -> pd.Series:
+    close = features["Close"]
+    target = (close.shift(-1) > close).astype(float)
+    return target
